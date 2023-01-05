@@ -1,0 +1,32 @@
+#version 330 core
+
+in vec3 vertColor;
+in vec2 TexCoord;
+in vec3 FragPos;
+in vec3 normal;
+
+out vec4 FragColor;
+uniform sampler2D texAtlas;
+uniform vec3 lightColor;
+uniform vec3 lightDir;
+uniform vec3 viewPos;
+
+void main() 
+{
+	float ambientStrength = 0.5f;
+	vec3 ambient = ambientStrength * lightColor;
+	//vec3 lightDir = normalize(lightdir);
+
+	//diffuse calculations
+	float diff = max(dot(normal, lightDir), 0.0);
+
+	//specular calculations
+	float specStrength = 0.95f;
+	vec3 viewDir = normalize(viewPos - FragPos);
+	vec3 reflectDir = reflect(-lightDir, normal);
+	float spec = pow(max(dot(viewDir, reflectDir), 0.0f), 32);
+	vec3 specular = specStrength * spec * lightColor;
+
+	vec4 result = vec4(ambient + diff + specular, 1.0f) * texture(texAtlas, TexCoord);
+	FragColor = result; 
+}
